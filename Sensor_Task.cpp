@@ -14,7 +14,7 @@ Sensor_Task::~Sensor_Task() {
 }
 
 void Sensor_Task::start_task() {
-  xTaskCreatePinnedToCore([](void* arg){
+  xTaskCreate([](void* arg){
     auto self  = static_cast<Sensor_Task*>(arg);
     
     TickType_t xLastWakeTime = xTaskGetTickCount();
@@ -25,6 +25,6 @@ void Sensor_Task::start_task() {
       vTaskDelayUntil(&xLastWakeTime, delay);
     }
     vTaskDelete(NULL);
-  }, "sensor task", 4096, this, 1, &m_update_task, 1);
+  }, "sensor task", 4096, this, 1, &m_update_task);
 }
 

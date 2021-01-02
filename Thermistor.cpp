@@ -14,28 +14,37 @@ float Thermistor::get_reading() {
   return m_reading;
 }
 
-Thermistor::Thermistor(adc1_channel_t adc, adc_atten_t attenuation) :
-m_adc(adc),
+Thermistor::Thermistor(adc1_channel_t adc_channel, adc_atten_t attenuation) :
+m_adc_channel(adc_channel),
 m_atten(attenuation) {
-  adc_gpio_init(ADC_UNIT_1, ADC_CHANNEL_6);
-  adc1_config_channel_atten(m_adc, m_atten);
+  adc_gpio_init(ADC_UNIT_1, static_cast<adc_channel_t>(m_adc_channel));
+  adc1_config_channel_atten(m_adc_channel, m_atten);
   adc1_config_width(ADC_WIDTH_BIT_12);
 
+  esp_adc_cal_characterize(ADC_UNIT_1, 
+    m_atten, 
+    ADC_WIDTH_BIT_12, 
+    ADC_VREF, 
+    &m_adc_cal_data);
+  
   // update once
   update();
 }
 
 void Thermistor::update() {
-  const int THERMISTORNOMINAL = 10000;
-  const int TEMPERATURENOMINAL = 22;
-  const int BCOEFFICIENT = 3950;
-  const int SERIESRESISTOR = 10000;
-
-  auto raw = adc1_get_raw(ADC1_CHANNEL_6);
-
-  float r =  (float) SERIESRESISTOR / (4095.0f / (float) raw - 1.0f);
-  float steinhart;
-  steinhart = r / THERMISTORNOMINAL;
+  uint32_t adc_reading = 0;
+  for(int i = 0; i < NO_OF_SAMPLES; i++) {
+    adc_reading += adc1_get_raw(m_adc_channel);
+  }
+  adc_reading /= NO_OF_SAMPLES;
+  
+  // Convert adc_reading to voltage in mV over thermistor (Rt)
+  // with compensation to the non-linear adc.
+  float Vt = static_cast<float>(esp_adc_cal_raw_to_voltage(adc_reading, &m_adc_cal_data));
+  
+  // Convert Volt to °C
+  float Rt = SERIESRESISTOR / ((VCC / Vt) - 1);
+  float steinhart = Rt / THERMISTORNOMINAL;
   steinhart = log(steinhart);
   steinhart /= BCOEFFICIENT;
   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15);
