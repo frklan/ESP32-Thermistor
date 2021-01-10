@@ -1,3 +1,10 @@
+/*
+ *  Copyright 2020-2021 Fredrik Andersson <fredrik.k.andersson@gmail.com>
+ *
+ *  This work is licensed under the CC BY-NC-SA 4.0 International License.
+ * 
+ */
+
 #pragma once
 #include <iostream>
 
