@@ -1,8 +1,28 @@
 # ESP32-Thermistor
 
-A very simple ESP32-idf driver for a Thermistor based temperture sensor.
+This is a very simple ESP32-idf driver for a Thermistor based temperature sensor.
 
 To be used as a component in a ESP-IDF project.
+
+## Circuit
+
+Wire the thermistor to one of the adc1 inputs on an ESP32 board via a 10k resistor
+
+```
+        o vcc
+        │
+       ┌┴┐
+       │ │ 10k
+       └┬┘
+ADC     │
+o───────┤
+        │
+       ┌┴┐╱
+       │╱│ Thermistor
+      ╱└┬┘
+        │
+       ═╧═
+```
 
 ## Contributing
 
