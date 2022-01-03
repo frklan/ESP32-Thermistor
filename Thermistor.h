@@ -93,7 +93,7 @@ class Thermistor: protected Sensor_Task {
     const int BCOEFFICIENT = 3950;
     const float SERIESRESISTOR = 10000.0f;
     const float VCC = 3300.0f;
-    const int MAX_HISTORY_LENGHT = 48;
+    const int MAX_HISTORY_LENGHT = 192;
     const int HISTORY_INTERVALL = 900; // seconds
 
     static std::map<adc1_channel_t, Thermistor*> channel_list;
